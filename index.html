@@ -1,0 +1,79 @@
+<html>
+<head>
+    <!-- load firebase, or database where we store data -->
+    <script src="https://cdn.firebase.com/js/client/2.2.1/firebase.js"></script>
+    <!-- load jquery which we will use to let javascript work with and change the HTML -->
+    <script src='https://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js'></script>
+    <!-- load our CSS file which ets us change the way the HTML looks, is colored, and responds -->
+    <link rel="stylesheet" type="text/css" href="example.css">
+</head>
+<body>
+
+<!-- CHAT MARKUP -->
+<div class="example-chat l-demo-container">
+    <header>Jaia Chat!</header>
+
+    <div class='example-chat-toolbar'>
+        <label for="nameInput">Username:</label>
+        <input type='text' id='nameInput' placeholder='enter an email...'>
+        <input type='text' id='pwdInput' placeholder='enter a password...'>
+    </div>
+</div>
+
+<!-- CHAT JAVASCRIPT -->
+<script>
+    // REGISTER DOM ELEMENTS
+    var nameField = $('#nameInput');
+    var pwdField = $('#pwdInput');
+
+    var ref = new Firebase("https://jaiachat.firebaseio-demo.com");
+
+    // LISTEN FOR KEYPRESS EVENT
+    nameField.keypress(function (e) {
+        if (e.keyCode == 13) {
+            handleLogin();
+        }
+    });
+    pwdField.keypress(function (e) {
+        if (e.keyCode == 13) {
+            handleLogin();
+        }
+    });
+
+    handleLogin = function() {
+        //FIELD VALUES
+        var username = nameField.val();
+        var pwd = pwdField.val();
+
+        ref.authWithPassword({
+            email    : nameField.val(),
+            password : pwdField.val()
+        }, function(error, authData) {
+            if (error) {
+                console.log("Login Failed!", error);
+
+                createUser();
+            } else {
+                console.log("Authenticated successfully with payload:", authData);
+                var usr = nameField.val();
+                window.location.href = "/chat.html?username="+usr;
+            }
+        });
+    }
+
+    createUser = function() {
+        ref.createUser({
+            email    : nameField.val(),
+            password : pwdField.val()
+        }, function(error, userData) {
+            if (error) {
+                console.log("Error creating user:", error);
+            } else {
+                var usr = nameField.val();
+                window.location.href = "/chat.html?username="+usr;
+            }
+        });
+    }
+</script>
+</body>
+</html>
